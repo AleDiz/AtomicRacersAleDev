@@ -1,0 +1,30 @@
+#pragma once
+
+#ifndef ENTITYTYPE_H
+#define ENTITYTYPE_H
+
+enum class EntityType{
+    UNKNOWN,
+    PLAYER,
+    OBJETOSMUNDO,
+    ROAD,
+    BOOSTGROUND,
+    GROUNDINFINITY,
+    IA,
+    OBJETOCOLISIONABLE,
+    WAYPOINT,
+    SOUND,
+    SOUND3DSTATIC,
+    SOUNDACTIVATION,
+    RENDER,
+    POWERUP,
+    BOTON,
+    SPRITE,
+    PLAYERONLINE,
+    CAMERA, 
+    NOTAIENTITY,
+    MUESTRA,
+    PARTICLE
+};
+
+#endif

@@ -1,0 +1,20 @@
+#pragma once
+
+#ifndef OBJECTRIGIDTYPE_H
+#define OBJECTRIGIDTYPE_H
+
+enum ObjectRigidType{
+    TYPE_UNKNOW = 0,
+    TYPE_CHASIS_CAR = 1,
+    TYPE_WALL = 2,
+    TYPE_GROUND = 3,
+    TYPE_POWER_UP_RANDOM = 4,
+    TYPE_BOX_POWER_UP = 5,
+    TYPE_WAYPOINT = 6,
+    TYPE_GROUND_INFINITY = 7,
+    TYPE_BOOST_GROUND = 8,
+    TYPE_WALL_SPECIAL = 9,
+    TYPE_SOUND_ACTIVATION = 10
+};
+
+#endif

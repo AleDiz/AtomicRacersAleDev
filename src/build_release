@@ -1,0 +1,72 @@
+#!/bin/bash
+
+# ==== RUTAS ====
+SOURCE_DIR="src/"
+BUILD_DIR="Atomic_Racers"
+FMOD_DIR="fmod"
+BULLET_DIR="/usr/include/bullet"
+
+# ==== INCLUDES ====
+INCLUDES="
+-I $SOURCE_DIR/components
+-I $SOURCE_DIR/commons
+-I $SOURCE_DIR/Engine
+-I $SOURCE_DIR/Events
+-I $SOURCE_DIR/Entity
+-I $SOURCE_DIR/util
+-I $SOURCE_DIR/man
+-I $SOURCE_DIR/net
+-I $SOURCE_DIR/scenes
+-I $SOURCE_DIR/system
+-I $FMOD_DIR/api/core/inc
+-I $FMOD_DIR/api/studio/inc
+-I $BULLET_DIR
+-I glad/include
+-I glad/src
+"
+
+# ==== LIBRERÍAS ====
+LIBRARY_DIRS="
+-L $FMOD_DIR/api/core/lib/x86_64
+-L $FMOD_DIR/api/studio/lib/x86_64
+"
+
+LIBRARIES="
+-lglfw
+-lraylib
+-lBullet3Collision
+-lBullet3Common
+-lBulletDynamics
+-lBulletCollision
+-lBullet3Geometry
+-lLinearMath
+-lBullet3Dynamics
+-lfmod
+-lfmodstudio
+-lassimp
+-lvlc
+"
+
+# ==== FLAGS ====
+CXXFLAGS="-O1 -s -std=c++23"
+RUNTIME_PATH="-Wl,-rpath=libs/"  # o el path donde copies las libs FMOD
+
+# ==== CREAR OUTPUT ====
+mkdir -p $BUILD_DIR
+
+# ==== FUENTES ====
+SOURCES=$(find $SOURCE_DIR -name "*.cpp")
+
+GLAD_SRC="glad"
+SOURCES="$SOURCES $GLAD_SRC/src/glad.c"
+
+
+# ==== COMPILACIÓN ====
+g++ -o $BUILD_DIR/AtomicRacers $SOURCES $CXXFLAGS $INCLUDES $LIBRARY_DIRS -static-libgcc -static-libstdc++ $LIBRARIES $RUNTIME_PATH
+
+# ==== COMPROBACIÓN ====
+if [ $? -eq 0 ]; then
+    echo "¡Release compilado exitosamente en $BUILD_DIR/AtomicRacers!"
+else
+    echo "Hubo un error durante la compilación."
+fi
