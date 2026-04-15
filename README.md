@@ -28,7 +28,7 @@ Instead of using traditional Finite State Machines (FSM), I engineered a Utility
 * **Logic:** AI agents evaluate multiple environmental variables (obstacles, distance to other cars, available power-ups, distance to the next waypoint) through a scoring matrix.
 * **Implementation:** Used mathematical response curves to normalize inputs, allowing for more "human-like" decision-making compared to rigid IF-THEN logic.
 * **🔗 Code Highlight:**
-  * [UtilityAI_System.cpp](https://github.com/AleDiz/AtomicRacersAleDev/blob/main/src/util/UtilityAI.cpp) — *Scoring loop and action selection logic.*
+  * [UtilityAI.cpp](https://github.com/AleDiz/AtomicRacersAleDev/blob/main/src/util/UtilityAI.cpp) — *Scoring loop and action selection logic.*
   * [AISystem.cpp](https://github.com/AleDiz/AtomicRacersAleDev/blob/main/src/system/AISystem.cpp)  — *Execution of AI actions.*
   * [AIComponent.hpp](https://github.com/AleDiz/AtomicRacersAleDev/blob/main/src/components/AIComponent.hpp)  — *AI data structure.*
 
@@ -55,3 +55,7 @@ As the **Team Lead**, I was responsible for the project's health and delivery:
 * **GitHub:** [AleDiz](https://github.com/AleDiz)
 * **LinkedIn:** [Alejandro Díaz](https://www.linkedin.com/in/alejandro-diaz-alcaraz-037099242)
 * **Email:** aledevgames@gmail.com
+
+---
+
+Note: As this was a collaborative project developed within a Spanish-speaking academic environment, some internal code comments remain in Spanish, though the core architecture and documentation are presented in English.
