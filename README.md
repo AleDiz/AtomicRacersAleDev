@@ -38,9 +38,9 @@ I developed the underlying architecture to handle rendering within our custom EC
 * **Architecture:** Built upon the Facade Pattern. The RenderManager relies on a GraphicsAPI virtual class. Entities possess a RenderComponent which is processed by the RenderSystem and passed to the RenderManager for drawing.
 *  **[Render Structure Diagram](https://github.com/AleDiz/AtomicRacersAleDev/blob/main/img/RenderComponentDiagram.png)**
 * **🔗 Code Highlight:** 
-  * [RenderManager.cpp](https://github.com/AleDiz/AtomicRacersAleDev/blob/main/src/man/RenderManager.cpp) — *Check the use of the GraphicsAPI to render the game.*
-  * [GraphicsAPI.hpp](https://github.com/AleDiz/AtomicRacersAleDev/blob/main/src/engine/GraphicsAPI.hpp) / [RaylibAPI.cpp](https://github.com/AleDiz/AtomicRacersAleDev/blob/main/src/engine/RaylibAPI.cpp)  — *Check the facade for the graphic engines and the Raylib adaptation.*
-  * [RenderSystem.cpp](https://github.com/AleDiz/AtomicRacersAleDev/blob/main/src/system/RenderSystem.cpp) — *Check the Render system the connection between the ECS and the RenderManager .*
+  * [RenderManager.cpp](https://github.com/AleDiz/AtomicRacersAleDev/blob/main/src/man/RenderManager.cpp) — *Usage of GraphicsAPI to render the game.*
+  * [GraphicsAPI.hpp](https://github.com/AleDiz/AtomicRacersAleDev/blob/main/src/engine/GraphicsAPI.hpp) / [RaylibAPI.cpp](https://github.com/AleDiz/AtomicRacersAleDev/blob/main/src/engine/RaylibAPI.cpp)  — *The facade for graphics engines and the Raylib implementation.*
+  * [RenderSystem.cpp](https://github.com/AleDiz/AtomicRacersAleDev/blob/main/src/system/RenderSystem.cpp) — *The bridge between the ECS and the RenderManager.*
 
 ---
 
