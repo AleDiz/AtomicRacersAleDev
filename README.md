@@ -1,7 +1,6 @@
 <p align="center">
   <img src="https://github.com/AleDiz/AtomicRacersAleDev/blob/main/img/logo_atomic.png" alt="Atomic Racers Logo" width="400">
 </p>
-# Atomic Racers 🏎️
 
 **Project Role:** Technical Game Designer & Team Lead  
 **Tech Stack:** Custom C++ Engine | ECS Architecture | Utility AI  
