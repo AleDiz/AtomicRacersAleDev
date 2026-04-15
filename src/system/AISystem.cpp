@@ -6,12 +6,12 @@
 
 #include "../util/EnumsActions.hpp"
 
-#include "../Entity/Entity.hpp"                // Entidades
+#include "../Entity/Entity.hpp"                // Entities
 #include "../man/EntityManager.hpp"
 #include "../components/VehicleComponent.hpp"
 #include "../components/WaypointComponent.hpp"
 
-const float TURN_THRESHOLD = 0.08f; // Umbral en radianes (ajustable)
+const float TURN_THRESHOLD = 0.08f; // Threshold in radians (adjustable)
 
 void AISystem::arrive(E &e, float tx, float tz)
 {
@@ -21,12 +21,12 @@ void AISystem::arrive(E &e, float tx, float tz)
     btTransform transform = v.m_carChassis->getWorldTransform();
     btVector3 position = transform.getOrigin();
 
-    // Diferencias en posición
+    // Position differences
     float dx = tx - position.getX();
     float dz = tz - position.getZ();
     float distanceSq = dx * dx + dz * dz;
 
-    // Verificar si estamos dentro del radio de llegada
+    // Check if we are within arrival radius
     
     float distance = std::sqrt(distanceSq);
 
@@ -45,7 +45,7 @@ void AISystem::arrive(E &e, float tx, float tz)
         float desiredAngle = std::atan2(dz, dx);
         auto forward = v.m_vehicle->getForwardVector();
         btVector3 forwardXZ = forward;
-        forwardXZ.setY(0); // Asegurarse de que el vector esté en el plano XZ
+        forwardXZ.setY(0); // Ensure the vector is in the XZ plane
         forwardXZ.normalize();
 
         if (desiredAngle < 0)
@@ -53,14 +53,14 @@ void AISystem::arrive(E &e, float tx, float tz)
 
         float currentAngle = std::atan2(forwardXZ.getZ(), forwardXZ.getX());
 
-        // Diferencia angular (ajustar al rango [-PI, PI])
+        // Angular difference (adjust to range [-PI, PI])
         float angleDiff = desiredAngle - currentAngle;
         if (angleDiff > M_PI)
             angleDiff -= static_cast<float>(2.0f * M_PI);
         if (angleDiff < -M_PI)
             angleDiff += static_cast<float>(2.0f * M_PI);
 
-        // Aplicar la lógica de giro solo si la diferencia angular supera el umbral
+        // Apply turning logic only if angular difference exceeds threshold
         if (angleDiff < 0 && distance > 1.5f) {
             aic.actionInput.inputMask |= GameActions::ACTION_LEFT;  
             aic.actionInput.LJ = -std::clamp(std::abs(angleDiff)/v.max_steering_normal, 0.0f, 1.0f);
@@ -97,7 +97,7 @@ void AISystem::seek(E &e, float tx, float tz, int target)
     btTransform transform = v.m_carChassis->getWorldTransform();
     btVector3 position = transform.getOrigin();
 
-    // Dirección hacia el objetivo (seek) o en dirección contraria (flee)
+    // Direction towards the target (seek) or opposite direction (flee)
     float dx = tx - position.getX();
     float dz = tz - position.getZ();
 
@@ -117,18 +117,18 @@ void AISystem::seek(E &e, float tx, float tz, int target)
 
     float currentAngle = std::atan2(forwardXZ.getZ(), forwardXZ.getX());
 
-    // Diferencia angular (ajustar al rango [-PI, PI])
+    // Angular difference (adjust to range [-PI, PI])
     float angleDiff = desiredAngle - currentAngle;
     if (angleDiff > M_PI)
         angleDiff -= static_cast<float>(2.0f * M_PI);
     if (angleDiff < -M_PI)
         angleDiff += static_cast<float>(2.0f * M_PI);
 
-    // Movimiento hacia/desde el objetivo
+    // Movement towards/away from target
     aic.actionInput.inputMask |= GameActions::ACTION_ACCELERATE;
     aic.actionInput.R2 = 0.0f;
 
-    // Lógica de giro
+    // Turning logic
     if (angleDiff < 0) {
         aic.actionInput.inputMask |= GameActions::ACTION_LEFT;
         aic.actionInput.LJ = -std::clamp(std::abs(angleDiff) / v.max_steering_normal, 0.0f, 1.0f);
@@ -137,7 +137,7 @@ void AISystem::seek(E &e, float tx, float tz, int target)
         aic.actionInput.LJ = std::clamp(angleDiff / v.max_steering_normal, 0.0f, 1.0f);
     }
 
-    // Derrape si el ángulo es suficientemente pronunciado
+    // Drift if angle is steep enough
     if (aic.initDriftDirection != 0 && (std::signbit(aic.initDriftDirection) != std::signbit(angleDiff))) {
         aic.initDriftDirection = 0;
         aic.actionInput.inputMask &= ~GameActions::ACTION_DRIFT;
@@ -174,26 +174,26 @@ void AISystem::align(E &e, float tx, float tz, bool backwards)
 
     float currentAngle = std::atan2(forwardXZ.getZ(), forwardXZ.getX());
 
-    // Asegurar que ambos ángulos estén en [0, 2π]
+    // Ensure both angles are in [0, 2π]
     if (desiredAngle < 0)
         desiredAngle += static_cast<float>(2.0f * M_PI);
     if (currentAngle < 0)
         currentAngle += static_cast<float>(2.0f * M_PI);
 
-    // Diferencia angular ajustada a [-PI, PI]
+    // Angular difference adjusted to [-PI, PI]
     float angleDiff = desiredAngle - currentAngle;
     if (angleDiff > M_PI)
         angleDiff -= static_cast<float>(2.0f * M_PI);
     if (angleDiff < -M_PI)
         angleDiff += static_cast<float>(2.0f * M_PI);
 
-    // Si el ángulo es pequeño, no hace falta girar
+    // If angle is small, no need to turn
     if (std::abs(angleDiff) < 0.05f) {
         aic.actionInput.LJ = 0.0f;
         return;
     }
 
-    // Aplicar dirección de giro
+    // Apply turning direction
     if(!backwards){
         if (angleDiff < 0) {
             aic.actionInput.inputMask |= GameActions::ACTION_LEFT;
@@ -224,7 +224,7 @@ void AISystem::update_one_entity(E &e, btDynamicsWorld *dynamicsWorld, bool upda
     // renderShape.shape.position = {aiComp.targetCollision.getX(), 10.0f, aiComp.targetCollision.getZ()};
     
 
-    // Refresco del tiempo
+    // Time refresh
     aiComp.accumulatedTime += deltatime;
     if (aiComp.accumulatedTime >= aiComp.time2Update)
     {
@@ -232,19 +232,19 @@ void AISystem::update_one_entity(E &e, btDynamicsWorld *dynamicsWorld, bool upda
         aiComp.accumulatedTime = 0.0f;
     }
 
-    //Recargo cooldown de los powerUp
+    // Reload power-up cooldown
     aiComp.powerupCooldown -= deltatime;
     if(aiComp.powerupCooldown < 0.0f){
         aiComp.powerupCooldown = 0.0f;
     }
 
-    // Comprobación de los waypoints
+    // Check waypoints
     checkWaypoint(e);
     
     
     if (aiComp.tactive && !aiComp.goingBack)
     {
-    //LOGICA CON UTILITY (HAY QUE HACER LOS EXECUTE DE CADA ACCION CON LO QUE DEBERIAN HACER)
+    // LOGIC WITH UTILITY (NEED TO IMPLEMENT EXECUTE FOR EACH ACTION WITH WHAT THEY SHOULD DO)
         aiComp.actionInput = {};
         auto& actionToDo = *aiComp.actions[aiComp.actionIt];
         actionToDo.execute(e);
@@ -329,7 +329,7 @@ void AISystem::update_one_entity(E &e, btDynamicsWorld *dynamicsWorld, bool upda
             if(aiComp.powerupCooldown == 0.0f){
                 aiComp.powerupCooldown = 3.0f;
                 if(v.powerUp == PowerUps::SHELL){
-                    //Align al objetivo
+                    // Align to target
                     aiComp.recalculatePoint = true;
                     align(e, aiComp.targetCollision.getX(), aiComp.targetCollision.getZ(), false);
                     aiComp.actionInput.inputMask |= GameActions::ACTION_POWERUP;
@@ -341,7 +341,7 @@ void AISystem::update_one_entity(E &e, btDynamicsWorld *dynamicsWorld, bool upda
         }
         }
     }else if(aiComp.goingBack){
-        //Logica para volver al circuito 
+        // Logic to return to the track
         aiComp.timeOut += deltatime;
         aiComp.actionInput.inputMask |= GameActions::ACTION_BRAKE;
         aiComp.actionInput.L2 = 0.0f;
@@ -357,35 +357,6 @@ void AISystem::update_one_entity(E &e, btDynamicsWorld *dynamicsWorld, bool upda
         if(aiComp.timeOut > 5.0f){
             aiComp.goingBack = false;
             aiComp.timeOut = 0.0f;
-
-            // // Posición del waypoint actual (donde reaparece)
-            // btVector3 currentPos(aiComp.waypointX, v.m_carChassis->getWorldTransform().getOrigin().getY(), aiComp.waypointZ);
-
-            // // Obtener siguiente waypoint
-            // auto const& waypoint = e.getParent().getEntityById(e.getParent().getEntitiesAux2()[aiComp.waypoint2Go]);
-            // auto const& wComp = waypoint->getParent().getComponent<WaypointComponent>(waypoint->getComponentKey<WaypointComponent>().value());
-            // btTransform nextTransform = wComp.rigidBody->getWorldTransform();
-            // btVector3 nextPos = nextTransform.getOrigin();
-
-            // // Calcular dirección desde el actual al siguiente waypoint
-            // btVector3 direction = nextPos - currentPos;
-            // direction.setY(0); // solo en el plano XZ
-            // direction.normalize();
-
-            // // Calcular ángulo (yaw) hacia el siguiente waypoint
-            // float angle = std::atan2(direction.getZ(), direction.getX());
-
-            // // Crear rotación y nueva transformada
-            // btQuaternion rotation(btVector3(0, 1, 0), angle);
-            // btTransform newTransform;
-            // newTransform.setOrigin(currentPos);
-            // newTransform.setRotation(rotation);
-
-            // // Aplicar transformada y resetear físicas
-            // v.m_carChassis->setWorldTransform(newTransform);
-            // v.m_carChassis->setLinearVelocity(btVector3(0, 0, 0));
-            // v.m_carChassis->setAngularVelocity(btVector3(0, 0, 0));
-            // v.m_carChassis->clearForces();
         }
     }
 }
@@ -399,18 +370,18 @@ void AISystem::update(EManager &EM, btDynamicsWorld *dynamicsWorld, bool updateI
 
 btVector3 AISystem::PredictOvertakePointFromVel(
     const btVector3& myPos,
-    const btVector3& rivalPos,     // punto detectado por raycast (no el centro del coche rival)
-    const btVector3& myReducedVel, // velocidad propia reducida
+    const btVector3& rivalPos,     // point detected by raycast (not the rival car's center)
+    const btVector3& myReducedVel, // own reduced velocity
     const btVector3& targetWaypoint, 
     float t,
     float lateralDistance,
     int rayLeft,
     int rayRight
 ) {
-    // 1. Posición futura desde mi propia velocidad reducida
+    // 1. Future position from own reduced velocity
     btVector3 futurePos = rivalPos + myReducedVel * t;
 
-    // 2. Dirección hacia el waypoint (desde mi posición actual)
+    // 2. Direction towards waypoint (from my current position)
     btVector3 dirToWaypoint = targetWaypoint - myPos;
     dirToWaypoint.setY(0);
     if (dirToWaypoint.length2() < 0.001f)
@@ -418,16 +389,16 @@ btVector3 AISystem::PredictOvertakePointFromVel(
 
     dirToWaypoint.normalize();
 
-    // 3. Vector lateral (izquierda relativa a la dirección)
+    // 3. Lateral vector (left relative to direction)
     btVector3 lateral = dirToWaypoint.cross(btVector3(0, 1, 0)).normalized();
 
-    // 4. Determinar si el waypoint está a la izquierda o derecha del punto de colisión
+    // 4. Determine if waypoint is to the left or right of collision point
     btVector3 toWaypointFromRival = targetWaypoint - rivalPos;
     toWaypointFromRival.setY(0);
 
     float sideSign = lateral.dot(toWaypointFromRival) > 0 ? 1.0f : -1.0f;
 
-    // 5. Crear punto de adelantamiento en el lado del waypoint
+    // 5. Create overtake point on waypoint's side
     btVector3 overtakePoint = futurePos + lateral * (sideSign * lateralDistance);
 
     return overtakePoint;
@@ -437,17 +408,17 @@ btVector3 AISystem::PredictOvertakePointFromVel(
 
 void AISystem::detectCollisions(btDynamicsWorld *dynamicsWorld, E &e)
 {
-    // Obtener la transformacion actual del coche
+    // Get current car transform
     auto &v = e.getParent().getComponent<VehicleComponent>(e.getComponentKey<VehicleComponent>().value());
     auto &iac = e.getParent().getComponent<AIComponent>(e.getComponentKey<AIComponent>().value());
 
     auto carTransform = v.m_carChassis->getWorldTransform();
   
 
-    // Longitud de los rayos
+    // Ray length
     float rayLength = iac.visionDistance;
 
-    // Definir offsets para las esquinas del coche (delanteras y traseras)
+    // Define offsets for car corners (front and rear)
     btVector3 frontLeft1Offset(1*0.3, 0, 2*0.6);  
     btVector3 frontLeft2Offset(1*0.6, 0, 2*0.6);  
     btVector3 frontLeft3Offset(1*0.6, 0, 2*0.6-0.3);  
@@ -462,7 +433,7 @@ void AISystem::detectCollisions(btDynamicsWorld *dynamicsWorld, E &e)
     btVector3 frontLeftOffsetGL(1*rayLength/2, 0, rayLength);  
     btVector3 frontRightOffsetGR(-1*rayLength/2, 0, rayLength);
 
-    // Calcular posiciones globales para las esquinas
+    // Calculate global positions for corners
     btVector3 frontLeft1Position = carTransform * frontLeft1Offset;
     btVector3 frontLeft2Position = carTransform * frontLeft2Offset;
     btVector3 frontLeft3Position = carTransform * frontLeft3Offset;
@@ -477,63 +448,63 @@ void AISystem::detectCollisions(btDynamicsWorld *dynamicsWorld, E &e)
     btVector3 frontLeftGround = carTransform * frontLeftOffsetGL;
     btVector3 frontRigthGround = carTransform * frontRightOffsetGR;
 
-    // Direcciones diagonales para los rayos
-    // Delantera izquierda
+    // Diagonal directions for rays
+    // Front left
     btVector3 diagonalDirectionFL1 = carTransform.getBasis() * btVector3(0,0,1);  
-    btVector3 diagonalDirectionFL2 = carTransform.getBasis() * btVector3(0.577f, 0, 1);  // Delantera izquierda
+    btVector3 diagonalDirectionFL2 = carTransform.getBasis() * btVector3(0.577f, 0, 1);  // Front left
     btVector3 diagonalDirectionFL3 = carTransform.getBasis() * btVector3(0.577f, 0, 1);
 
-    //delantera derecha
+    // Front right
     btVector3 diagonalDirectionFR1 = carTransform.getBasis() * btVector3(0,0,1);
     btVector3 diagonalDirectionFR2 = carTransform.getBasis() * btVector3(-0.577f, 0, 1); 
     btVector3 diagonalDirectionFR3 = carTransform.getBasis() * btVector3(-0.577f, 0, 1);
 
 
-    //atras izquierda
+    // Rear left
     btVector3 diagonalDirectionRL1 = carTransform.getBasis() * btVector3(0,0,-1);
     btVector3 diagonalDirectionRL2 = carTransform.getBasis() * btVector3(1, 0, -1);
     btVector3 diagonalDirectionRL3 = carTransform.getBasis() * btVector3(1, 0, 0);
 
-    //atras derecha
+    // Rear right
     btVector3 diagonalDirectionRR1 = carTransform.getBasis() * btVector3(0,0,-1);
     btVector3 diagonalDirectionRR2 = carTransform.getBasis() * btVector3(-1, 0, -1);
     btVector3 diagonalDirectionRR3 = carTransform.getBasis() * btVector3(-1, 0, 0);
 
 
-    // Rayos al suelo
+    // Rays to ground
     btVector3 diagonalDirectionFL_Ground = btVector3(0, -1, 0);
     btVector3 diagonalDirectionFR_Ground = btVector3(0, -1, 0);
 
     
 
-    // Definir rayos (inicio y fin)
-    //izquierda
+    // Define rays (start and end)
+    // left
     btVector3 frontLeftRayEnd = frontLeft1Position + diagonalDirectionFL1.normalized() * rayLength;
     btVector3 frontLeftRayEnd2 = frontLeft2Position + diagonalDirectionFL2.normalized() * rayLength;
     btVector3 frontLeftRayEnd3 = frontLeft3Position + diagonalDirectionFL3.normalized() * rayLength;
 
-    //derecha
+    // right
     btVector3 frontRightRayEnd = frontRight1Position + diagonalDirectionFR1.normalized() * rayLength;
     btVector3 frontRightRayEnd2 = frontRight2Position + diagonalDirectionFR2.normalized() * rayLength;
     btVector3 frontRightRayEnd3 = frontRight3Position + diagonalDirectionFR3.normalized() * rayLength;
 
-    //atras izquierda
+    // rear left
     btVector3 rearLeftRayEnd = rearLeftPosition + diagonalDirectionRL1.normalized() * rayLength;
     btVector3 rearLeftRayEnd2 = rearLeftPosition + diagonalDirectionRL2.normalized() * rayLength;
     btVector3 rearLeftRayEnd3 = rearLeftPosition + diagonalDirectionRL3.normalized() * rayLength;
 
-    //atras derecha
+    // rear right
     btVector3 rearRightRayEnd = rearRightPosition + diagonalDirectionRR1.normalized() * rayLength;
     btVector3 rearRightRayEnd2 = rearRightPosition + diagonalDirectionRR2.normalized() * rayLength;
     btVector3 rearRightRayEnd3 = rearRightPosition + diagonalDirectionRR3.normalized() * rayLength;
 
-    //rayos suelo
+    // ground rays
     btVector3 frontLeftGroundRayEnd = frontLeftGround + diagonalDirectionFL_Ground.normalized() * rayLength;
     btVector3 frontRightGroundRayEnd = frontRigthGround + diagonalDirectionFR_Ground.normalized() * rayLength;
    
     
 
-    // Lambda para realizar pruebas de rayos
+    // Lambda to perform ray tests
     auto performRayTest = [&](const btVector3 &start, const btVector3 &end, float &distance, btVector3 &targetCollisionRay, int &targetType, int num)
     {
         btCollisionWorld::ClosestRayResultCallback callback(start, end);
@@ -549,7 +520,7 @@ void AISystem::detectCollisions(btDynamicsWorld *dynamicsWorld, E &e)
             targetCollisionRay = callback.m_hitPointWorld;
 
 
-            const char* objectName = "Desconocidoooo";  // Valor por defecto
+            const char* objectName = "Unknown";  // Default value
 
             if (collidedEntity != nullptr)
             {
@@ -557,11 +528,11 @@ void AISystem::detectCollisions(btDynamicsWorld *dynamicsWorld, E &e)
                 {
                     case EntityType::PLAYER:
                     case EntityType::IA:
-                        objectName = "Coche";
+                        objectName = "Car";
                         targetType = 1;
                         break;
                     case EntityType::OBJETOSMUNDO:
-                        objectName = "Muro";
+                        objectName = "Wall";
                         targetType = 0;
                         break;
                     case EntityType::POWERUP:
@@ -569,19 +540,19 @@ void AISystem::detectCollisions(btDynamicsWorld *dynamicsWorld, E &e)
                         targetType = 2;
                         break;
                     case EntityType::GROUNDINFINITY:
-                        objectName = "Suelo slow";
+                        objectName = "Slow ground";
                         targetType = 3;
                         break;
                     case EntityType::BOOSTGROUND:
-                        objectName = "Suelo boost";
+                        objectName = "Boost ground";
                         targetType = 4;
                         break;
                     case EntityType::ROAD:
-                        objectName = "Carretera";
+                        objectName = "Road";
                         targetType = 5;
                         break;
                     default:
-                        objectName = "Objeto desconocido";
+                        objectName = "Unknown object";
                         targetType = -1;
                         break;
                 }
@@ -604,37 +575,37 @@ void AISystem::detectCollisions(btDynamicsWorld *dynamicsWorld, E &e)
         }
     };
 
-    // rayos delantera izquierda
-    performRayTest(frontLeft1Position, frontLeftRayEnd, iac.rayFrontLeft.distance, iac.rayFrontLeft.rayCollision, iac.rayFrontLeft.type, 1); //recto
-    performRayTest(frontLeft2Position, frontLeftRayEnd2, iac.rayDiaLeft.distance, iac.rayDiaLeft.rayCollision, iac.rayDiaLeft.type, 2); //esquina
-    performRayTest(frontLeft3Position, frontLeftRayEnd3, iac.rayVertLeft.distance, iac.rayVertLeft.rayCollision, iac.rayVertLeft.type, 3); //lateral
+    // Front left rays
+    performRayTest(frontLeft1Position, frontLeftRayEnd, iac.rayFrontLeft.distance, iac.rayFrontLeft.rayCollision, iac.rayFrontLeft.type, 1); // straight
+    performRayTest(frontLeft2Position, frontLeftRayEnd2, iac.rayDiaLeft.distance, iac.rayDiaLeft.rayCollision, iac.rayDiaLeft.type, 2); // corner
+    performRayTest(frontLeft3Position, frontLeftRayEnd3, iac.rayVertLeft.distance, iac.rayVertLeft.rayCollision, iac.rayVertLeft.type, 3); // lateral
 
     
     lessDistanceRays(iac.rayFrontLeft, iac.rayDiaLeft, iac.rayVertLeft, e, 0);
     
 
-    // Rayos para la esquina delantera derecha
-    performRayTest(frontRight1Position, frontRightRayEnd, iac.rayFrontRight.distance, iac.rayFrontRight.rayCollision, iac.rayFrontRight.type, 4); //recto
-    performRayTest(frontRight2Position, frontRightRayEnd2, iac.rayDiaRight.distance, iac.rayDiaRight.rayCollision, iac.rayDiaRight.type, 2); //esquina
-    performRayTest(frontRight3Position, frontRightRayEnd3, iac.rayVertRight.distance, iac.rayVertRight.rayCollision, iac.rayVertRight.type, 3); //lateral
+    // Rays for front right corner
+    performRayTest(frontRight1Position, frontRightRayEnd, iac.rayFrontRight.distance, iac.rayFrontRight.rayCollision, iac.rayFrontRight.type, 4); // straight
+    performRayTest(frontRight2Position, frontRightRayEnd2, iac.rayDiaRight.distance, iac.rayDiaRight.rayCollision, iac.rayDiaRight.type, 2); // corner
+    performRayTest(frontRight3Position, frontRightRayEnd3, iac.rayVertRight.distance, iac.rayVertRight.rayCollision, iac.rayVertRight.type, 3); // lateral
     
     
     lessDistanceRays(iac.rayFrontRight, iac.rayDiaRight, iac.rayVertRight, e, 1);
    
     
-    // Rayos para la esquina trasera izquierda
-    performRayTest(rearLeftPosition, rearLeftRayEnd, iac.rayBackLeft.distance, iac.rayBackLeft.rayCollision, iac.rayBackLeft.type, 5); //recto
-    performRayTest(rearLeftPosition, rearLeftRayEnd2, iac.rayBackDia.distance, iac.rayBackDia.rayCollision, iac.rayBackDia.type, 2); //diagonal
-    performRayTest(rearLeftPosition, rearLeftRayEnd3, iac.rayBackVert.distance, iac.rayBackVert.rayCollision, iac.rayBackVert.type, 3); //vertical
+    // Rays for rear left corner
+    performRayTest(rearLeftPosition, rearLeftRayEnd, iac.rayBackLeft.distance, iac.rayBackLeft.rayCollision, iac.rayBackLeft.type, 5); // straight
+    performRayTest(rearLeftPosition, rearLeftRayEnd2, iac.rayBackDia.distance, iac.rayBackDia.rayCollision, iac.rayBackDia.type, 2); // diagonal
+    performRayTest(rearLeftPosition, rearLeftRayEnd3, iac.rayBackVert.distance, iac.rayBackVert.rayCollision, iac.rayBackVert.type, 3); // vertical
 
     
     lessDistanceRays(iac.rayBackLeft, iac.rayBackDia, iac.rayBackVert, e, 2);
     
 
-    // Rayos para la esquina trasera derecha
-    performRayTest(rearRightPosition, rearRightRayEnd, iac.rayBackRight.distance, iac.rayBackRight.rayCollision, iac.rayBackRight.type, 6); //recto
-    performRayTest(rearRightPosition, rearRightRayEnd2, iac.rayBackDiaRight.distance, iac.rayBackDiaRight.rayCollision, iac.rayBackDiaRight.type, 2); //diagonal
-    performRayTest(rearRightPosition, rearRightRayEnd3, iac.rayBackVertRight.distance, iac.rayBackVertRight.rayCollision, iac.rayBackVertRight.type, 3); //vertical
+    // Rays for rear right corner
+    performRayTest(rearRightPosition, rearRightRayEnd, iac.rayBackRight.distance, iac.rayBackRight.rayCollision, iac.rayBackRight.type, 6); // straight
+    performRayTest(rearRightPosition, rearRightRayEnd2, iac.rayBackDiaRight.distance, iac.rayBackDiaRight.rayCollision, iac.rayBackDiaRight.type, 2); // diagonal
+    performRayTest(rearRightPosition, rearRightRayEnd3, iac.rayBackVertRight.distance, iac.rayBackVertRight.rayCollision, iac.rayBackVertRight.type, 3); // vertical
 
     
     lessDistanceRays(iac.rayBackRight, iac.rayBackDiaRight, iac.rayBackVertRight, e, 3);
@@ -705,31 +676,31 @@ void AISystem::lessDistanceRays(rays &r1, rays &r2, rays &r3, E &e, int pos)
 
     switch (pos)
     {
-    case 0: // ARRIBA IZQUIERDA
+    case 0: // TOP LEFT
         ai.targetCollisionTOPLEFT = closest.rayCollision;
         ai.targetTypeTOPLEFT = closest.type;
         ai.targetDistanceTOPLEFT = closest.distance;
         break;
 
-    case 1: // ARRIBA DERECHA
+    case 1: // TOP RIGHT
         ai.targetCollisionTOPRIGHT = closest.rayCollision;
         ai.targetTypeTOPRIGHT = closest.type;
         ai.targetDistanceTOPRIGHT = closest.distance;
         break;
 
-    case 2: // ABAJO IZQUIERDA
+    case 2: // BOTTOM LEFT
         ai.targetCollisionREARLEFT = closest.rayCollision;
         ai.targetTypeREARLEFT = closest.type;
         ai.targetDistanceREARLEFT = closest.distance;
         break;
 
-    case 3: // ABAJO DERECHA
+    case 3: // BOTTOM RIGHT
         ai.targetCollisionREARRIGHT = closest.rayCollision;
         ai.targetTypeREARRIGHT = closest.type;
         ai.targetDistanceREARRIGHT = closest.distance;
         break;
 
-    case 4: // DELANTE SUELO
+    case 4: // FRONT GROUND
         ai.targetCollisionGroundL = r1.rayCollision;
         ai.targetTypeGroundL = r1.type;
         ai.targetDistanceGroundL = r1.distance;
@@ -756,7 +727,7 @@ void AISystem::updateScoreActions(E &v)
         NScore = action->scoreAction(v);
         
         
-        // Obtener el nombre de la acción
+        // Get action name
         std::string actionName = typeid(*action).name();
 
         
@@ -802,7 +773,7 @@ void AISystem::calculateClosestCoord(E& e)
 
     btRigidBody* waypointBody = waypointComponent.getRigidBody();
     btTransform waypTransform = waypointBody->getWorldTransform();
-    btVector3 waypCenter = waypTransform.getOrigin(); // Centro del waypoint
+    btVector3 waypCenter = waypTransform.getOrigin(); // Waypoint center
 
     btBoxShape* boxShape = static_cast<btBoxShape*>(waypointBody->getCollisionShape());
     btVector3 halfExtents = boxShape->getHalfExtentsWithoutMargin();
@@ -815,10 +786,10 @@ void AISystem::calculateClosestCoord(E& e)
     btMatrix3x3 rotationMatrix(rotation);
 
     btVector3 corners[4] = {
-        btVector3(-halfExtents.getX(), 0, -halfExtents.getZ()),  // Esquina inferior izquierda
-        btVector3( halfExtents.getX(), 0, -halfExtents.getZ()),  // Esquina inferior derecha
-        btVector3(-halfExtents.getX(), 0,  halfExtents.getZ()),  // Esquina superior izquierda
-        btVector3( halfExtents.getX(), 0,  halfExtents.getZ())   // Esquina superior derecha
+        btVector3(-halfExtents.getX(), 0, -halfExtents.getZ()),  // Bottom left corner
+        btVector3( halfExtents.getX(), 0, -halfExtents.getZ()),  // Bottom right corner
+        btVector3(-halfExtents.getX(), 0,  halfExtents.getZ()),  // Top left corner
+        btVector3( halfExtents.getX(), 0,  halfExtents.getZ())   // Top right corner
     };
 
     btVector3 worldCorners[4];
@@ -828,7 +799,7 @@ void AISystem::calculateClosestCoord(E& e)
 
     float arrivalRadius = aiComp.arrivalRadius;
 
-    //Logica de cercania a punto
+    // Proximity logic to point
     float posVX = coordenadasVehiculo.getX();
     float posVZ = coordenadasVehiculo.getZ();
 
@@ -848,32 +819,32 @@ void AISystem::calculateClosestCoord(E& e)
     btVector3 bestPoint;
     minDistanceSquared = FLT_MAX;
 
-    // Función auxiliar para proyectar un punto sobre un segmento
+    // Helper function to project a point onto a segment
     auto projectPointOnSegment = [](const btVector3& a, const btVector3& b, const btVector3& p) -> btVector3 {
         btVector3 ab = b - a;
         btVector3 ap = p - a;
 
         float abLengthSquared = ab.length2();
-        if (abLengthSquared == 0.0f) return a; // Segmento degenerado
+        if (abLengthSquared == 0.0f) return a; // Degenerate segment
 
         float t = ap.dot(ab) / abLengthSquared;
-        t = std::clamp(t, 0.0f, 1.0f); // Clampear para que se quede dentro del segmento
+        t = std::clamp(t, 0.0f, 1.0f); // Clamp to stay within segment
 
         return a + t * ab;
     };
 
-    // Definimos los pares de bordes por cada esquina
+    // Define edge pairs for each corner
     const std::array<std::pair<int, int>, 8> edgePairs = {{
-        {0, 1}, {0, 2}, // Para corner 0
-        {1, 0}, {1, 3}, // Para corner 1
-        {2, 0}, {2, 3}, // Para corner 2
-        {3, 2}, {3, 1}  // Para corner 3
+        {0, 1}, {0, 2}, // For corner 0
+        {1, 0}, {1, 3}, // For corner 1
+        {2, 0}, {2, 3}, // For corner 2
+        {3, 2}, {3, 1}  // For corner 3
     }};
 
-    // Calculamos los índices base según la esquina más cercana
+    // Calculate base indices according to closest corner
     int edgeIndexBase = closestIndex * 2;
 
-    // Primero buscamos el punto más cercano al vehículo en los bordes
+    // First find closest point to vehicle on edges
     for (int i = 0; i < 2; ++i) {
         const auto& [cornerA, cornerB] = edgePairs[edgeIndexBase + i];
 
@@ -886,15 +857,15 @@ void AISystem::calculateClosestCoord(E& e)
         }
     }
 
-    // Ahora proyectamos la dirección del vehículo sobre el waypoint
+    // Now project vehicle direction onto waypoint
     btVector3 vehicleForward = v.m_vehicle->getForwardVector();
-    vehicleForward.setY(0); // Asegurarse de que el vector esté en el plano XZ
+    vehicleForward.setY(0); // Ensure vector is in XZ plane
     vehicleForward.normalize();
 
-    // Creamos un punto muy por delante del coche en su dirección de avance
+    // Create a point far ahead of car in its direction
     btVector3 projectedPoint = vehiclePos + vehicleForward * btSqrt(minDistanceSquared);
 
-    // Proyectamos ese punto sobre los bordes del waypoint
+    // Project that point onto waypoint edges
     btVector3 forwardProjection {};
     minDistanceSquared = FLT_MAX;
 
@@ -910,9 +881,9 @@ void AISystem::calculateClosestCoord(E& e)
         }
     }
 
-    // Finalmente calculamos el punto medio entre el más cercano y la proyección hacia adelante
-    float speed = v.m_vehicle->getCurrentSpeedKmHour() / 3.6f; // O como midas la velocidad
-    float weightForward = std::clamp(speed / v.maxSpeed, 0.1f, 0.7f); // Escala dinámica
+    // Finally calculate midpoint between closest and forward projection
+    float speed = v.m_vehicle->getCurrentSpeedKmHour() / 3.6f; // Or however you measure speed
+    float weightForward = std::clamp(speed / v.maxSpeed, 0.1f, 0.7f); // Dynamic scale
     float weightBest = 1.0f - weightForward;
     
     btVector3 targetPoint = bestPoint * weightBest + forwardProjection * weightForward;
@@ -923,8 +894,7 @@ void AISystem::calculateClosestCoord(E& e)
     /*
     
 
-
-    //Actualizo el cuadrado debug
+    // Update debug square
     
     // auto &renderShape = e.getParent().getComponent<RenderShapeComponent>(e.getComponentKey<RenderShapeComponent>().value());
     // renderShape.shape.position = {targetPoint.getX(), 2.0f, targetPoint.getZ()};

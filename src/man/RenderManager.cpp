@@ -55,14 +55,6 @@ void RenderManager::loadingAssets(myMesh mesh){
     renderer->loadModelCachedScreen(direcciones[0], direcciones[1]);
 }
 
-// JSONManager lucesJSON;
-// lucesJSON.loadJSON("assets/JSON/luces/lucesPositions.json");
-// lucesJSON.leerposiciones("assets/JSON/luces/lucesPositions.json", lucesPos);
-
-// for(int i = 0; i < lucesPos.size(); i++){
-//     renderer->apiPutLigth(lucesPos[i], myColor{255, 255, 255, 255});
-// }
-
 void RenderManager::render(){
     
     renderer->apiUpdateCamera(dataCamera);
@@ -70,7 +62,7 @@ void RenderManager::render(){
     renderer->apiSetBackgroundColor(myColor{ 0, 0, 0, 255 });
 
     renderer->apiStartDraw();
-    //Pintamos los 2Ds
+    //Updating the video logic
     for (myImage& image : dataImages){
         std::array<std::string, 4> direcciones;
         json2dIds->getInfo2D(image.id, direcciones);
@@ -112,12 +104,9 @@ void RenderManager::render(){
         renderer->updateVideo();
     }
     
-    
-    
-    //Comenzamos el dibujado
-
+    //Starting the 3D draws
     renderer->apiStartDraw3D();
-    //Primero vemos los id y lo traducimos a path, tras esto se le pasa al api correspondiente junto con su posición y rotación
+   //First, we retrieve the IDs and convert them to paths; then we pass them to the corresponding API along with their position and rotation
     for (myMesh& mesh : dataMesh){
         std::array<std::string, 3> direcciones;
 
@@ -133,10 +122,6 @@ void RenderManager::render(){
     for (myShape& shape : dataShape){
         renderer->apiDrawCube(shape.position, shape.rotation ,shape.width,shape.height, shape.length, shape.color);
     }
-    //Despues se pasan las luces al api
-    for (myLight& light : dataLights){
-        //renderer->apiPutLigth(pos, color, intensidad) WARNING ALE
-    }
 
     if(debugRender){
         debugWorld->debugDrawWorld();
@@ -144,10 +129,10 @@ void RenderManager::render(){
 
     finishRender3D();
     
-    //Actualizamos la camara
+    //Updating the camera
 
     renderer->apiStartDraw();
-    //Pintamos los 2Ds
+    //Drawing the 2Ds
     for (myImage& image : dataImages){
         std::array<std::string, 4> direcciones;
         json2dIds->getInfo2D(image.id, direcciones);
@@ -173,7 +158,7 @@ void RenderManager::render(){
         }
     }
 
-    //Pinto texto
+    //Drawing the texts
     for (myText& text : dataText){
         float scaleX = 1.0f;
         float scaleY = 1.0f;
@@ -199,7 +184,6 @@ void RenderManager::finishRender(){
     renderer->apiFinishDraw();
     dataMesh.clear();    
     dataShape.clear();
-    //dataLights.clear();
     dataImages.clear();
     dataText.clear();
     dataParticle.clear();
@@ -215,7 +199,6 @@ void RenderManager::configure(int WW, int WH, int fps){
     window.FPS = fps;
 
     renderer->apiChangeResolution(WW, WH);
-    //Se podrian cambiar los fps tmb
 }
 
 void RenderManager::setWindow(int type){
@@ -259,8 +242,6 @@ void RenderManager::addRenderData(myCamera myCamera)
 
 void RenderManager::addRenderData(myLight myLight)
 {
-
-    //QUITARLAS CUANDO ESTE LA PANTALLA DE CARGA
     JSONManager lucesJSON;
     lucesJSON.loadJSON("assets/JSON/luces/lucesPositions.json");
     lucesJSON.leerposiciones("assets/JSON/luces/lucesPositions.json", lucesPos);
@@ -295,7 +276,7 @@ void RenderManager::initRender(){
 }
 
 myVector2 RenderManager::getMousePos(){
-    //Devuelve la posicion del raton en la pantalla
+    //Returns the position of the mouse on the screen
     return renderer->apiGetMouse();
 }
 

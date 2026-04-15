@@ -27,15 +27,15 @@ class AIComponent {
         bool    tactive    { true };
         int     posicion    {0};
 
-        float   arrivalRadius {1.0f};    // Radio de llegada: Margen que detecta si ha llegado al punto o no /// 10.0
-        float   time2arrive   {0.15f};    // Tiempo que espera llegar al punto, acelera cuando esta lejos y empieza a frenar cuando esta a 0.5 /// 0.15
-                                          // segundos de llegar l punto.
-        float   visionDistance {14.0f};    // Distancia de vision del vehiculo
+        float   arrivalRadius {1.0f};    // Arrival radius: Margin that detects if it has reached the point or not /// 10.0
+        float   time2arrive   {0.15f};   // Time expected to reach the point, accelerates when far and starts to brake when at 0.5 /// 0.15
+                                          // seconds from reaching the point.
+        float   visionDistance {14.0f};  // Vision distance of the vehicle
         
 
-        float   accumulatedTime {0.0f};   // Tiempo desde la ultima actualizacion del comportamiento
-        float   time2Update     {0.1f};   // Tiempo que tarda en actualizar el comportamiento. Es el inverso de la frecuencia.
-                                          // si quiero percibir 10 veces por segundo es 1/10, 5 veces por segundo 1/5 ó 0.2 ...
+        float   accumulatedTime {0.0f};  // Time since the last behavior update
+        float   time2Update     {0.1f};  // Time it takes to update the behavior. It is the inverse of the frequency.
+                                          // if I want to perceive 10 times per second it is 1/10, 5 times per second 1/5 or 0.2 ...
 
         float waypointX {0.0f};
         float waypointZ {0.0f};
@@ -43,7 +43,7 @@ class AIComponent {
         SB      behaviour       {SB::PATHFOLLOWING};
  
 
-        int waypoint2Go {-1}; //Marca el id del waypoint al que tendria que ir
+        int waypoint2Go {-1}; // Marks the id of the waypoint it should go to
         std::array<std::shared_ptr<Action>, 8> actions;
         int actionIt {0};
 
@@ -53,11 +53,11 @@ class AIComponent {
         myInput actionInput {};
         int initDriftDirection {};
 
-        btVector3 targetCollision{0.0f, 0.0f, 0.0f}; // posicion FINAL
-        btVector3 targetCollisionGround{0.0f, 0.0f, 0.0f}; // posicion FINAL
+        btVector3 targetCollision{0.0f, 0.0f, 0.0f}; // FINAL position
+        btVector3 targetCollisionGround{0.0f, 0.0f, 0.0f}; // FINAL position
 
 
-        //collisiones finales
+        // Final collisions
         float targetDistanceTOPLEFT{20.0f}; 
         float targetDistanceTOPRIGHT{20.0f};
         float targetDistanceREARLEFT{20.0f};
@@ -89,7 +89,7 @@ class AIComponent {
 
 
 
-        //estructuras que pasar al detect collision
+        // Structures to pass to detectCollision
         rays rayFrontLeft{0.0f, btVector3(20.0f, 0.0f, 0.0f), -1};
         rays rayDiaLeft{0.0f, btVector3(20.0f, 0.0f, 0.0f), -1};
         rays rayVertLeft{0.0f, btVector3(20.0f, 0.0f, 0.0f), -1};
@@ -106,7 +106,7 @@ class AIComponent {
         rays rayBackDiaRight{0.0f, btVector3(20.0f, 0.0f, 0.0f), -1};
         rays rayBackVertRight{0.0f, btVector3(20.0f, 0.0f, 0.0f), -1};
 
-        //rayos suelo
+        // Ground rays
         rays rayGroundFrontLeft{0.0f, btVector3(20.0f, 0.0f, 0.0f), -1};
         rays rayGroundFrontRight{0.0f, btVector3(20.0f, 0.0f, 0.0f), -1};
         rays rayGroundFrontTEST{0.0f, btVector3(20.0f, 0.0f, 0.0f), -1};

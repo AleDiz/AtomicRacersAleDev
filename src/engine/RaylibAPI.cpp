@@ -17,7 +17,7 @@ RaylibAPI::RaylibAPI(uint16_t width, uint16_t height, const char *windowName, ui
 
 RaylibAPI::~RaylibAPI() {
     for (auto& entry : modelCache) {
-        UnloadModel(entry.second); // Liberar cada modelo cargado
+        UnloadModel(entry.second); // Unload the charged models
     }
 }
 
@@ -85,12 +85,12 @@ void RaylibAPI::loadModelCachedScreen(const std::string& path, const std::string
 }
 
 Model RaylibAPI::loadModelCached(const std::string& path, const std::string& pathT) {
-    // Si el modelo ya está en caché, devolverlo
+    // If the model is already cached, return it
     if (modelCache.find(path) != modelCache.end()) {
         return modelCache[path];
     }
 
-    // Si no está en caché, cargarlo y guardarlo
+    // If not cached, load the model and store it
     Model model = LoadModel(path.c_str());
     if(pathT != ""){
         Texture2D texture = LoadTexture(pathT.c_str());
@@ -101,15 +101,15 @@ Model RaylibAPI::loadModelCached(const std::string& path, const std::string& pat
 }
 
 Texture2D RaylibAPI::loadTextureCached(const std::string& path) {
-    // Si la textura ya está en caché, devolverla
+    // If the texture is already cached, return it
     if (textureCache.find(path) != textureCache.end()) {
         return textureCache[path];
     }
 
-    // Si no está en caché, cargar la textura y guardarla
+    // If not cached, load the texture and store it
     Image image = LoadImage(path.c_str());
     Texture2D texture = LoadTextureFromImage(image);
-    UnloadImage(image);  // Ya no necesitamos la imagen en RAM
+    UnloadImage(image);  // We no longer need the image in RAM
 
     textureCache[path] = texture;
     return texture;
@@ -161,7 +161,7 @@ void RaylibAPI::apiDrawCollisionShape(myVector3 position, myVector3 size, myColo
 void RaylibAPI::apiLoadFont(uint8_t idFont, const std::string &filePath, uint16_t size)
 {
     if (fonts.find(idFont) == fonts.end()) 
-    {  // Verifica si la clave ya está en el mapa
+    {  // Verifies if the key is already in the map
         fonts[idFont] = LoadFontEx(filePath.c_str(), static_cast<int>(size), 0, 255);
     }
 }
@@ -195,20 +195,15 @@ void RaylibAPI::apiDrawCentredTextWithFont(uint8_t idFont , const char *text, ui
 
 void RaylibAPI::apiDrawTxtWithFont(uint8_t idFont , const char *text, uint16_t posX, uint16_t posY, uint8_t fontSize, myColor color)
 {
-    // Font font = getFont(idFont);
-    // Color colorV = {color.r, color.g, color.b, color.a};
-    // Vector2 position = {static_cast<float>(posX), 
-    //                     static_cast<float>(posY)};
-
-    // DrawTextEx(font, text, position, fontSize, 1.0f, colorV);
+    
 }
 
 void RaylibAPI::apiDrawImage(const std::string& src, float x, float y, float scale, myColor col)
 {
-    // Cargar imagen desde el archivo
+    // Load image as texture (with caching)
     Texture2D texture = loadTextureCached(src);
 
-    Vector2 position = { x, y };  // No aplicamos rotación
+    Vector2 position = { x, y }; // Position where the image will be drawn
     Color tint {col.r,col.g, col.b, col.a};
 
     DrawTextureEx(texture, position, 0.0f, scale, tint);
@@ -250,7 +245,7 @@ float RaylibAPI::apiGetDeltaTime(){
 float RaylibAPI::apiGetWindowTime(){
     return GetTime();
 }
-//Devuelve la posicion del raton dentro de la ventana
+//Returns the position of the mouse on the screen
 myVector2 RaylibAPI::apiGetMouse(){
     auto mousePos  = GetMousePosition();
     return myVector2{mousePos.x, mousePos.y};
@@ -278,9 +273,9 @@ myInput RaylibAPI::apiReturnInput()
     float R2 {0.0f};
     float L2 {0.0f};
 
-    // Detectar estado del gamepad (usamos el primer joystick como ejemplo)
+    // Detect the input from the gamepad if it's available, otherwise use the keyboard
     if (IsGamepadAvailable(0)) {
-        // Botones del gamepad
+        // Gamepad buttons
         if (IsGamepadButtonReleased(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)) {  // A o X (Xbox) / Cross (PS)
             lastInput |= ComponentKey::COMPONENT_ENTER;
         }
@@ -294,7 +289,7 @@ myInput RaylibAPI::apiReturnInput()
             lastInput |= ComponentKey::COMPONENT_ENTER;
         }
 
-        // Bumper izquierdo y derecho
+        // Left and right triggers as buttons
         if (IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_TRIGGER_1)) {   // L1 (PS) / LB (Xbox)
             lastInput |= ComponentKey::COMPONENT_SP;
         }
@@ -302,7 +297,7 @@ myInput RaylibAPI::apiReturnInput()
             lastInput |= ComponentKey::COMPONENT_ENTER;
         }
 
-        // Ejes del gamepad
+        // Gamepad axes for movement
         float axisX = GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X);
         if (axisX > 0.06f) {
             lastInput |= ComponentKey::COMPONENT_D;
@@ -323,7 +318,7 @@ myInput RaylibAPI::apiReturnInput()
 
  
     }else {
-        // Si no hay gamepad, usar teclas del teclado
+        // If no gamepad is available, use keyboard input
         if (IsKeyDown(KEY_W)) {
             lastInput |= ComponentKey::COMPONENT_W;
         }

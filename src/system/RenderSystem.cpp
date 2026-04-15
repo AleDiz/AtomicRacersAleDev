@@ -6,12 +6,10 @@
 #include "../man/RenderManager.hpp"
 
 void RenderSystem::update(EManager& EM, RenderManager* RM){
-    //Falta recorrer las luces y la camara
     EM.forAllCondition<void(*)(E&, RenderManager*),Render3dComponent>   (update_render_one_entity_mesh,  RM);
     EM.forAllCondition<void(*)(E&, RenderManager*),RenderShapeComponent>(update_render_one_entity_shape, RM);
     EM.forAllCondition<void(*)(E&, RenderManager*),ParticlesComponent>  (update_render_one_entity_particle, RM);
     EM.forAllCondition<void(*)(E&, RenderManager*),CameraComponent>     (update_render_one_entity_camera, RM);
-    //EM.forAllCondition<void(*)(E&, RenderManager*),RenderLightComponent>(update_render_one_entity_shape,RM);
 
     EM.forAllCondition<void(*)(E&, RenderManager*), Render2dComponent>  (update_render_one_entity_image, RM);
     EM.forAllCondition<void(*)(E&, RenderManager*), RenderTextComponent>  (update_render_one_entity_text, RM);
@@ -29,19 +27,18 @@ void RenderSystem::update_render_one_entity_mesh(E& e, RenderManager* RM){
         pos = vc.interpolatedTransform.getOrigin();
         rot = vc.interpolatedTransform.getRotation();
 
-        //Girar el chasis hacia donde este derrapando
-        //if(vc.stateVehicle == StateVehicle::DRIFTING){
+        //Turn the chassis towards the direction it's drifting
         if(vc.drifting){
-            float driftEffect = vc.steeringDrift * 0.4f;  // Factor de inclinación en Z
-            float yawEffect = vc.steeringDrift * 1.2f;    // Factor de giro en Y exagerado
+            float driftEffect = vc.steeringDrift * 0.4f;  // Z-axis tilt factor
+            float yawEffect = vc.steeringDrift * 1.2f;    // Y-axis yaw factor
             
             btQuaternion currentRot = rot;
         
-            // Crear las rotaciones objetivo
+            // Creating the tilt and yaw quaternions based on the drift effect
             btQuaternion driftTilt(btVector3(0, 0, 1), driftEffect);
             btQuaternion driftYaw(btVector3(0, 1, 0), yawEffect); 
         
-            // Aplicar la inclinación y el giro
+            // Apply the drift rotation to the current rotation
             btQuaternion targetRot = driftYaw * currentRot * driftTilt;
         
             rot = targetRot;
@@ -76,7 +73,7 @@ void RenderSystem::update_render_one_entity_mesh(E& e, RenderManager* RM){
         
     }else if(e.tipo == EntityType::MUESTRA){
         pos = {0.0f, 0.0f, 0.0f};
-        float angle = 0.3f * RM->getWindowTime(); // tiempo acumulado
+        float angle = 0.3f * RM->getWindowTime();
         rot= {btVector3(0, 1, 0), angle};
     }
 
@@ -85,7 +82,7 @@ void RenderSystem::update_render_one_entity_mesh(E& e, RenderManager* RM){
     thisMesh.position = myVector3{pos.getX(),pos.getY(),pos.getZ()};
     thisMesh.rotation = myQuaternion{rot.getAngle(),myVector3{rot.getAxis().getX(),rot.getAxis().getY(),rot.getAxis().getZ()}};
 
-    //Añadir al vector de renderManager
+    //Add to renderManager vector
     RM->addRenderData(thisMesh);
 };
 
@@ -100,7 +97,7 @@ void RenderSystem::update_render_one_entity_shape(E& e, RenderManager* RM){
         pos = vc.interpolatedTransform.getOrigin();
         rot = vc.interpolatedTransform.getRotation();
 
-        //Girar el chasis hacia donde este derrapando
+        //Rotate the chassis towards the direction it's drifting
         if(e.getParent().hasComponent<AIComponent>(e)){
             auto& renderShape = e.getParent().getComponent<RenderShapeComponent>(e.getComponentKey<RenderShapeComponent>().value());
             RM->addRenderData(renderShape.shape);
@@ -130,7 +127,7 @@ void RenderSystem::update_render_one_entity_shape(E& e, RenderManager* RM){
         thisShape.position = myVector3{sc.positionDebug.x, sc.positionDebug.y, sc.positionDebug.z};
     }
 
-    //Añadir al vector de renderManager
+    //Add to renderManager vector
     RM->addRenderData(thisShape);
 };
 
@@ -148,7 +145,6 @@ void RenderSystem::update_render_one_entity_camera(E& e,RenderManager* RM){
 };
 
 void RenderSystem::update_render_one_entity_light(E& e,RenderManager* RM){
-    //WARNING ALE - cuando se añada la logica de las luces acabar esto
 };
 
 void RenderSystem::update_render_one_entity_image(E& e, RenderManager* RM){
@@ -191,7 +187,7 @@ void RenderSystem::update_render_one_entity_particle(E& e, RenderManager* RM){
         thisParticle.position = myVector3{pos.getX(),pos.getY(),pos.getZ()};
         thisParticle.rotation = myQuaternion{rot.getAngle(),myVector3{rot.getAxis().getX(),rot.getAxis().getY(),rot.getAxis().getZ()}};
 
-        //Añadir al vector de renderManager
+        //Add to renderManager vector
         RM->addRenderData(thisParticle);
     }
 }

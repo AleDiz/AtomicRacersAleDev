@@ -41,7 +41,7 @@ public:
     virtual void updateVideo() = 0;
     virtual void unloadVideo() = 0;
 
-    // DRAWING IN 2D - HAY QUE REVISARLO
+    // DRAWING IN 2D
     virtual void apiLoadFont(uint8_t idFont, const std::string &filePath, uint16_t size) = 0;
     virtual void apiUnloadFonts() = 0;
     virtual void apiDrawText(const char* text, float x, float y, uint8_t fontSize, myColor color) = 0;

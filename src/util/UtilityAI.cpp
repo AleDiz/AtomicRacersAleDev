@@ -3,12 +3,12 @@
 #include "../Entity/Entity.hpp"
 #include "../man/EntityManager.hpp"
 
-// Implementación de Consideration
+// Consideration Implementation
 Consideration::Consideration(const std::string& name, float value) : name(name), value(value) {}
 std::string Consideration::getName() const { return name; }
 float Consideration::getValue() const { return value; }
 
-// Implementación de Action
+// Action Implementation
 Action::Action(const std::string& name) : name(name), score(1.0f) {}
 
 void Action::addConsideration(std::shared_ptr<Consideration> consideration) {
@@ -27,7 +27,7 @@ float Action::scoreAction(const E& v) {
             }
         }
 
-        // Reescalado del score de la acción
+        // Action score rescaling
         float originalScore = score;
         float modFactor = 1 - (1.0f / considerations.size());
         float makeupValue = (1 - originalScore) * modFactor;
@@ -45,7 +45,7 @@ std::string Action::getName() const { return name; }
 
 //-------------------CONSIDERATIONS-----------------------------------
 
-// Implementación de VelocityConsideration
+// VelocityConsideration Implementation
 VelocityConsideration::VelocityConsideration() : Consideration("Velocity", 0.0f) {}
 
 float VelocityConsideration::scoreConsideration(const E& v) const {
@@ -60,7 +60,7 @@ float VelocityConsideration::scoreConsideration(const E& v) const {
     return std::clamp(score,0.0f,1.0f);
 }
 
-// Implementación de AccelerationConsideration (NO HACE NADA, FALTAN LOS DIFERENTES COCHES)
+// AccelerationConsideration Implementation (DOES NOTHING, DIFFERENT CARS MISSING)
 AccelerationConsideration::AccelerationConsideration() : Consideration("Acceleration", 0.0f) {}
 
 float AccelerationConsideration::scoreConsideration(const E& v) const {
@@ -72,7 +72,7 @@ float AccelerationConsideration::scoreConsideration(const E& v) const {
     return std::clamp(score,0.0f,1.0f);
 }
 
-// Implementación de Distance2WallConsideration
+// Distance2WallConsideration Implementation
 Distance2WallConsideration::Distance2WallConsideration() : Consideration("Distance Wall", 0.0f) {}
 
 float Distance2WallConsideration::scoreConsideration(const E& v) const {
@@ -101,7 +101,7 @@ float Distance2WallConsideration::scoreConsideration(const E& v) const {
     return std::clamp(score, 0.1f, 1.0f);
 }
 
-// Implementación de Distance2PowerupConsideration
+// Distance2PowerupConsideration Implementation
 Distance2PowerupConsideration::Distance2PowerupConsideration() : Consideration("Distance PowerUp", 0.0f) {}
 
 float Distance2PowerupConsideration::scoreConsideration(const E& v) const {
@@ -128,7 +128,7 @@ float Distance2PowerupConsideration::scoreConsideration(const E& v) const {
     return std::clamp(score, 0.1f, 1.0f);
 }
 
-// Implementación de Distance2CarConsideration
+// Distance2CarConsideration Implementation
 Distance2CarConsideration::Distance2CarConsideration() : Consideration("Distance Car", 0.0f) {}
 
 float Distance2CarConsideration::scoreConsideration(const E& v) const {
@@ -154,7 +154,7 @@ float Distance2CarConsideration::scoreConsideration(const E& v) const {
     return std::clamp(score, 0.1f, 1.0f);
 }
 
-// Implementación de Distance2CarConsideration
+// Distance2CarAheadConsideration Implementation
 Distance2CarAheadConsideration::Distance2CarAheadConsideration() : Consideration("Distance Car Ahead ", 0.0f) {}
 
 float Distance2CarAheadConsideration::scoreConsideration(const E& v) const {
@@ -179,7 +179,7 @@ float Distance2CarAheadConsideration::scoreConsideration(const E& v) const {
     return std::clamp(score, 0.1f, 0.8f);
 }
 
-// Implementación de PositionConsideration
+// PositionConsideration Implementation
 PositionConsideration::PositionConsideration() : Consideration("Position", 0.0f) {}
 
 float PositionConsideration::scoreConsideration(const E& v) const {
@@ -194,26 +194,26 @@ float PositionConsideration::scoreConsideration(const E& v) const {
     return std::clamp(score, minScore, 1.0f);
 }
 
-// Implementación de LapConsideration
+// LapConsideration Implementation
 LapConsideration::LapConsideration() : Consideration("Lap", 0.0f) {}
 
 float LapConsideration::scoreConsideration(const E& v) const {
     auto &vc = v.getParent().getComponent<VehicleComponent>(v.getComponentKey<VehicleComponent>().value());
-    int vueltas = vc.vueltas;
+    int laps = vc.vueltas;
 
-    int maxVueltas = 3;
+    int maxLaps = 3;
 
-    float score = static_cast<float>(vueltas) / (float)maxVueltas;
+    float score = static_cast<float>(laps) / (float)maxLaps;
     return std::clamp(score, 0.0f, 1.0f);
 }
 
-// Implementación de PowerUpConsideration
+// PowerUpConsideration Implementation
 PowerUpConsideration::PowerUpConsideration() : Consideration("PowerUp", 0.0f) {}
 
 float PowerUpConsideration::scoreConsideration(const E& v) const {
     auto &vc = v.getParent().getComponent<VehicleComponent>(v.getComponentKey<VehicleComponent>().value());
     auto powerUp = vc.powerUp;
-    [[maybe_unused]] auto tamPowerUp = vc.tamPowerUp;
+    [[maybe_unused]] auto powerUpSize = vc.tamPowerUp;
 
     if (powerUp == PowerUps::ANYONE) {
         return 0.0f;
@@ -222,7 +222,7 @@ float PowerUpConsideration::scoreConsideration(const E& v) const {
     return 1.0f;
 }
 
-// Implementación de InversePowerUpConsideration
+// InversePowerUpConsideration Implementation
 InversePowerUpConsideration::InversePowerUpConsideration() : Consideration("Inversed PowerUp", 0.0f) {}
 
 float InversePowerUpConsideration::scoreConsideration(const E& v) const {
@@ -236,15 +236,15 @@ float InversePowerUpConsideration::scoreConsideration(const E& v) const {
     return 0.0f;
 }
 
-// Implementación de BoostConsideration
+// BoostConsideration Implementation
 BoostConsideration::BoostConsideration() : Consideration("Boost", 0.0f) {}
 
 float BoostConsideration::scoreConsideration(const E& v) const {
     auto &vc = v.getParent().getComponent<VehicleComponent>(v.getComponentKey<VehicleComponent>().value());
     auto powerUp = vc.powerUp;
-    auto tamPowerUp = vc.tamPowerUp;
+    auto powerUpSize = vc.tamPowerUp;
 
-    // Si tiene BOOST, escalamos el score (0.3 - 0.9)
+    // If has BOOST, we scale the score (0.3 - 0.9)
     if (powerUp == PowerUps::BOOST) {
         return 1.0f;
     }
@@ -252,46 +252,46 @@ float BoostConsideration::scoreConsideration(const E& v) const {
     return 0.1f;
 }
 
-// Implementación de ShellConsideration
+// ShellConsideration Implementation
 ShellConsideration::ShellConsideration() : Consideration("Shell", 0.0f) {}
 
 float ShellConsideration::scoreConsideration(const E& v) const {
     auto &vc = v.getParent().getComponent<VehicleComponent>(v.getComponentKey<VehicleComponent>().value());
     auto powerUp = vc.powerUp;
-    auto tamPowerUp = vc.tamPowerUp;
+    auto powerUpSize = vc.tamPowerUp;
 
-    // Si tiene BOOST, escalamos el score (0.3 - 0.9)
+    // If has SHELL, we scale the score (0.3 - 0.9)
     if (powerUp == PowerUps::SHELL) {
-        return 0.4f + 0.1f * ((float)tamPowerUp - 1); // Lineal: 0.5, 0.6, 0.7
+        return 0.4f + 0.1f * ((float)powerUpSize - 1); // Linear: 0.5, 0.6, 0.7
     }
 
     return 0.0f;
 }
 
-// Implementación de BananaConsideration
+// BananaConsideration Implementation
 BananaConsideration::BananaConsideration() : Consideration("Banana", 0.0f) {}
 
 float BananaConsideration::scoreConsideration(const E& v) const {
     auto &vc = v.getParent().getComponent<VehicleComponent>(v.getComponentKey<VehicleComponent>().value());
     auto powerUp = vc.powerUp;
-    auto tamPowerUp = vc.tamPowerUp;
+    auto powerUpSize = vc.tamPowerUp;
 
-    // Si tiene BOOST, escalamos el score (0.3 - 0.9)
+    // If has BANANA, we scale the score (0.3 - 0.9)
     if (powerUp == PowerUps::BANANA) {
-        return 0.4f + 0.1f * ((float)tamPowerUp - 1); // Lineal: 0.5, 0.6, 0.7
+        return 0.4f + 0.1f * ((float)powerUpSize - 1); // Linear: 0.5, 0.6, 0.7
     }
 
     return 0.0f;
 }
 
-//Pathfollowing consideration
+// PathFollowing Consideration
 PathFollowingConsideration::PathFollowingConsideration() : Consideration("PathFollowing", 0.0f) {}
 
 float PathFollowingConsideration::scoreConsideration([[maybe_unused]]const E& v) const {
     return 0.5f; 
 }
 
-//Pathfollowing consideration
+// Ground Consideration
 GroundConsideration::GroundConsideration() : Consideration("Ground", 0.0f) {}
 
 float GroundConsideration::scoreConsideration(const E& v) const {
@@ -312,7 +312,7 @@ float GroundConsideration::scoreConsideration(const E& v) const {
 
 //--------------------ACTIONS--------------------------------------------
 
-// Implementación de PathFollowingAction
+// PathFollowingAction Implementation
 PathFollowingAction::PathFollowingAction() : Action("PathFollowing") {}
 
 void PathFollowingAction::execute(E& v) {
@@ -320,7 +320,7 @@ void PathFollowingAction::execute(E& v) {
     aiComp.behaviour = SB::PATHFOLLOWING;
 }
 
-// Implementación de OvertakeAction
+// OvertakeAction Implementation
 OvertakeAction::OvertakeAction() : Action("Overtake") {}
 
 void OvertakeAction::execute(E& v) {
@@ -328,7 +328,7 @@ void OvertakeAction::execute(E& v) {
     aiComp.behaviour = SB::OVERTAKE;
 }
 
-// Implementación de GroundAction
+// GroundAction Implementation
 GroundAction::GroundAction() : Action("Ground") {}
 
 void GroundAction::execute(E& v) {
@@ -336,7 +336,7 @@ void GroundAction::execute(E& v) {
     aiComp.behaviour = SB::GROUNDACTION;
 }
 
-// Implementación de AvoidAction
+// AvoidAction Implementation
 AvoidAction::AvoidAction() : Action("Avoid") {}
 
 void AvoidAction::execute(E& v) {
@@ -344,7 +344,7 @@ void AvoidAction::execute(E& v) {
     aiComp.behaviour = SB::AVOID;
 }
 
-// Implementación de TakeObjectAction
+// TakeObjectAction Implementation
 TakeObjectAction::TakeObjectAction() : Action("TakeObject") {}
 
 void TakeObjectAction::execute(E& v) {
@@ -352,7 +352,7 @@ void TakeObjectAction::execute(E& v) {
     aiComp.behaviour = SB::TAKEOBJECT;
 }
 
-// Implementación de UseObjectBoostAction
+// UseObjectBoostAction Implementation
 UseObjectBoostAction::UseObjectBoostAction() : Action("UseObjectBoost") {}
 
 void UseObjectBoostAction::execute(E& v) {
@@ -360,7 +360,7 @@ void UseObjectBoostAction::execute(E& v) {
     aiComp.behaviour = SB::USEOBJECT;
 }
 
-// Implementación de UseObjectBananaAction
+// UseObjectBananaAction Implementation
 UseObjectBananaAction::UseObjectBananaAction() : Action("UseObjectBanana") {}
 
 void UseObjectBananaAction::execute(E& v) {
@@ -368,7 +368,7 @@ void UseObjectBananaAction::execute(E& v) {
     aiComp.behaviour = SB::USEOBJECT;
 }
 
-// Implementación de UseObjectShellAction
+// UseObjectShellAction Implementation
 UseObjectShellAction::UseObjectShellAction() : Action("UseObjectShell") {}
 
 void UseObjectShellAction::execute(E& v) {
