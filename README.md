@@ -1,3 +1,6 @@
+<p align="center">
+  <img src="https://github.com/AleDiz/AtomicRacersAleDev/blob/main/img/logo_atomic.png" alt="Atomic Racers Logo" width="400">
+</p>
 # Atomic Racers 🏎️
 
 **Project Role:** Technical Game Designer & Team Lead  
@@ -34,7 +37,7 @@ Instead of using traditional Finite State Machines (FSM), I engineered a Utility
 I developed the underlying architecture to handle rendering within our custom ECS.
 * **Implementation:** Designed a decoupled render system that could potentially draw the game in any graphics engine while remaining performant.
 * **Architecture:** Built upon the Facade Pattern. The RenderManager relies on a GraphicsAPI virtual class. Entities possess a RenderComponent which is processed by the RenderSystem and passed to the RenderManager for drawing.
-*  **Render Structure Diagram**
+*  **[Render Structure Diagram](https://github.com/AleDiz/AtomicRacersAleDev/blob/main/img/RenderComponentDiagram.png)**
 * **🔗 Code Highlight:** 
   * [RenderManager.cpp](https://github.com/AleDiz/AtomicRacersAleDev/blob/main/src/man/RenderManager.cpp) — *Check the use of the GraphicsAPI to render the game.*
   * [GraphicsAPI.hpp](https://github.com/AleDiz/AtomicRacersAleDev/blob/main/src/engine/GraphicsAPI.hpp) / [RaylibAPI.cpp](https://github.com/AleDiz/AtomicRacersAleDev/blob/main/src/engine/RaylibAPI.cpp)  — *Check the facade for the graphic engines and the Raylib adaptation.*
