@@ -14,28 +14,31 @@
 ---
 
 ## 🛠️ Technical & Design Overview
-The primary challenge of this project was building a cohesive racing experience from scratch without a commercial engine. As the **Lead**, I directed the holistic design vision while engineering the core technical architecture to ensure that gameplay systems (like the Utility AI and UI flow) remained decoupled, performant, and easy to iterate upon.
+The primary challenge of this project was building a cohesive racing experience from scratch without a commercial engine. As the Lead, I directed the holistic design vision while engineering the core technical architecture. I ensured the whole game remained decoupled from the graphics engine, facilitating a smooth transition from RayLib to our custom graphics API. I also stepped into the role of AI designer and developer, balancing challenge and fun to maximize player engagement.
 
 ---
 
 ## 👨‍💻 Key Systems & My Contributions
+Our custom C++ engine follows an ECS (Entity Component System) architecture. In this data-driven structure, entities are collections of data, components store that data, and systems process it. While I contributed to several areas of the engine, I specialized in the following two systems:
 
 ### 🧠 Utility-Based AI System
-Instead of using traditional Finite State Machines (FSM), I engineered a **Utility AI** to create organic and competitive opponent behavior.
-* **Logic:** AI agents evaluate multiple environmental sensors (track curvature, player distance, available power-ups) through a scoring matrix.
+Instead of using traditional Finite State Machines (FSM), I engineered a Utility AI to create organic and competitive opponent behavior.
+* **Logic:** AI agents evaluate multiple environmental variables (obstacles, distance to other cars, available power-ups, distance to the next waypoint) through a scoring matrix.
 * **Implementation:** Used mathematical response curves to normalize inputs, allowing for more "human-like" decision-making compared to rigid IF-THEN logic.
-* **🔗 Code Highlight:** [`UtilityAI_System.cpp`](TU_URL_AQUI) — *Check the scoring loop and action selection logic.*
+* **🔗 Code Highlight:**
+  * [UtilityAI_System.cpp](https://github.com/AleDiz/AtomicRacersAleDev/blob/main/src/util/UtilityAI.cpp) — *Scoring loop and action selection logic.*
+  * [AISystem.cpp](https://github.com/AleDiz/AtomicRacersAleDev/blob/main/src/system/AISystem.cpp)  — *Execution of AI actions.*
+  * [AIComponent.hpp](https://github.com/AleDiz/AtomicRacersAleDev/blob/main/src/components/AIComponent.hpp)  — *AI data structure.*
 
 ### 🎨 Custom Rendering & ECS Integration
-I developed the underlying technical architecture to support the core gameplay loop within our custom ECS.
-* **Implementation:** Designed the data-oriented rendering pipeline to handle high-speed entity updates without performance bottlenecks.
-* **Architecture:** Focused on memory locality within the ECS to ensure that the Render System and Physics System could access component data with minimal cache misses.
-* **🔗 Code Highlight:** [`Renderer.cpp`](TU_URL_AQUI) — *View the core frame rendering logic.*
-
-### 🖥️ Technical UI/UX Flow
-I took ownership of the complete UX/UI flow, building a robust architecture to handle state transitions.
-* **Implementation:** Developed an Event-Driven system to decouple the UI from the game's core logic, ensuring that menu transitions and HUD updates did not interfere with racing performance.
-* **🔗 Code Highlight:** [`UIManager.cpp`](TU_URL_AQUI) — *See the event-listener pattern implementation.*
+I developed the underlying architecture to handle rendering within our custom ECS.
+* **Implementation:** Designed a decoupled render system that could potentially draw the game in any graphics engine while remaining performant.
+* **Architecture:** Built upon the Facade Pattern. The RenderManager relies on a GraphicsAPI virtual class. Entities possess a RenderComponent which is processed by the RenderSystem and passed to the RenderManager for drawing.
+*  **Render Structure Diagram**
+* **🔗 Code Highlight:** 
+  * [RenderManager.cpp](https://github.com/AleDiz/AtomicRacersAleDev/blob/main/src/man/RenderManager.cpp) — *Check the use of the GraphicsAPI to render the game.*
+  * [GraphicsAPI.hpp](https://github.com/AleDiz/AtomicRacersAleDev/blob/main/src/engine/GraphicsAPI.hpp) / [RaylibAPI.cpp](https://github.com/AleDiz/AtomicRacersAleDev/blob/main/src/engine/RaylibAPI.cpp)  — *Check the facade for the graphic engines and the Raylib adaptation.*
+  * [RenderSystem.cpp](https://github.com/AleDiz/AtomicRacersAleDev/blob/main/src/system/RenderSystem.cpp) — *Check the Render system the connection between the ECS and the RenderManager .*
 
 ---
 
@@ -43,12 +46,6 @@ I took ownership of the complete UX/UI flow, building a robust architecture to h
 As the **Team Lead**, I was responsible for the project's health and delivery:
 * **Agile Workflow:** Implemented Scrum methodologies, managing 2-week sprints and daily stand-ups to maintain a 9-month development roadmap.
 * **Technical Vision:** Acted as the bridge between art and code, ensuring that artistic assets were integrated efficiently into our custom engine's technical constraints.
-
----
-
-## 📸 Technical Showcase
-*(Tip: Add a GIF here showing the AI pathfinding or a screenshot of your debug console showing FPS/ECS metrics)*
-![Gameplay Screenshot](TU_URL_A_IMAGEN_O_GIF)
 
 ---
 
