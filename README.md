@@ -2,7 +2,7 @@
   <img src="https://github.com/AleDiz/AtomicRacersAleDev/blob/main/img/logo_atomic.png" alt="Atomic Racers Logo" width="400">
 </p>
 
-**Project Role:** Technical Game Designer & Team Lead  
+**Project Role:** Programmer & Team Lead  
 **Tech Stack:** Custom C++ Engine | ECS Architecture | Utility AI  
 **Team Size:** 5 Members (9-month development cycle)
 
